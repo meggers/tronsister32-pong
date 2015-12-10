@@ -11,10 +11,10 @@ initialize: nop
     li $s0,0                # starting oam
     push $s0                #
                             #
-    li $s1,0                # x (left)
+    li $s1,0                # y (top)
     push $s1                #
                             #
-    li $s2,0                # y (top)
+    li $s2,0                # x (left)
     push $s2                #
                             #
     li $s3,paddle_width     # paddle width
@@ -34,10 +34,10 @@ initialize: nop
     #########################
     push $s0                # starting oam
                             #
-    addi $s1,$s1,248        # x (right)
-    push $s1                # 
+    push $s1                # y (top)
                             #
-    push $s2                # y (top)
+    li $s2,248              # x (right)
+    push $s2                # 
                             #
     push $s3                # paddle width
                             #
@@ -53,10 +53,10 @@ initialize: nop
     #########################
     push $s0                # starting oam
                             #
-    li $s1,8                # x (8 from left)
+    li $s1,8                # y (8 from top)
     push $s1                #
                             #
-    li $s2,8                # y (8 from top)
+    li $s2,8                # x (8 from left)
     push $s2                #
                             #
     li $s3,ball_width       # ball width
