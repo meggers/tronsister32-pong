@@ -72,7 +72,7 @@ initialize: nop
     add $s0,$0,$v0          # get next free position in oam
     #########################
 
-main_loop:
+main_loop: nop
 
 b main_loop
 
