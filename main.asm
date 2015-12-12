@@ -43,27 +43,6 @@ initialize: nop
     #############################
 
     #############################
-    # load right paddle         #
-    #############################
-    push $s0                    # starting oam
-    sw $s0,$0,right_paddle_oam  #
-                                #
-    push $s1                    # y (top)
-                                #
-    li $s2,248                  # x (right)
-    push $s2                    # 
-                                #
-    push $s3                    # paddle width
-                                #
-    push $s4                    # paddle height
-                                #
-    push $s5                    # paddle index
-                                #
-    call load_sprite_img        # load sprite into oam
-    add $s0,$0,$v0              # get next free position in oam
-    #############################
-
-    #############################
     # load ball                 #
     #############################
     push $s0                    # starting oam
@@ -82,6 +61,31 @@ initialize: nop
     push $s4                    #
                                 #
     li $s5,ball_index           # ball index
+    push $s5                    #
+                                #
+    call load_sprite_img        # load sprite into oam
+    add $s0,$0,$v0              # get next free position in oam
+    #############################
+
+    #############################
+    # load right paddle         #
+    #############################
+    push $s0                    # starting oam
+    sw $s0,$0,right_paddle_oam  #
+                                #
+    li $s1,0                    # y (top)
+    push $s1                    #
+                                #
+    li $s2,248                  # x (right)
+    push $s2                    # 
+                                #
+    li $s3,paddle_width         # paddle width
+    push $s3                    #
+                                #
+    li $s4,paddle_height        # paddle height
+    push $s4                    #
+                                #
+    li $s5,paddle_index         # paddle index
     push $s5                    #
                                 #
     call load_sprite_img        # load sprite into oam
