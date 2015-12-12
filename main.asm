@@ -9,14 +9,15 @@ right_paddle_xvel:  .word 0
 right_paddle_yvel:  .word 0
 
 ball_oam:           .word 0
-ball_xvel:          .word 0
+ball_xvel:          .word 1
 ball_yvel:          .word 0
 
 .text
 
 initialize: nop
 
-    # load left paddle
+    #############################
+    # load left paddle          #
     #############################
     li $s0,0                    # starting oam
     push $s0                    #
@@ -41,7 +42,8 @@ initialize: nop
     add $s0,$0,$v0              # get next free position in oam
     #############################
 
-    # load right paddle
+    #############################
+    # load right paddle         #
     #############################
     push $s0                    # starting oam
     sw $s0,$0,right_paddle_oam  #
@@ -61,7 +63,8 @@ initialize: nop
     add $s0,$0,$v0              # get next free position in oam
     #############################
 
-    # load ball
+    #############################
+    # load ball                 #
     #############################
     push $s0                    # starting oam
     sw $s0,$0,ball_oam          #
@@ -86,40 +89,142 @@ initialize: nop
     #############################
 
 main_loop: nop
-
-    ######
-    # Move left paddle
-    ######
-    lw $t0,$0,left_paddle_yvel
-    push $t0
-
-    lw $t0,$0,left_paddle_xvel
-    push $t0
-
-    lw $t0,$0,left_paddle_oam
-    push $t0
-
-    call move_sprite_img
-
-    #####
-    # Move right paddle
-    #####
-    lw $t0,$0,right_paddle_yvel
-    push $t0
-
-    lw $t0,$0,right_paddle_xvel
-    push $t0
-
-    lw $t0,$0,right_paddle_oam
-    push $t0
-
-    call move_sprite_img
-
-b main_loop
+    b main_loop
 
 # handle game tick interrupt
 game_tick_interrupt: nop
-    jr $epc
+    push $s0
+
+    ##########################################
+    # Check for ball/left paddle collision   #
+    ##########################################
+    addi $t0,$0,paddle_width
+    push $t0
+
+    addi $t0,$0,ball_width
+    push $t0
+
+    addi $t0,$0,paddle_height
+    push $t0
+
+    addi $t0,$0,ball_height
+    push $t0
+
+    lw $t0,$0,left_paddle_oam
+    add $t0,$t0,oam_copy
+    lw $t0,$0,$t0
+    push $t0
+
+    lw $t0,$0,ball_oam
+    add $t0,$t0,oam_copy
+    lw $t0,$0,$t0
+    push $t0
+
+    call check_collision
+    li $t0,$0,TRUE
+    sub $0,$t0,$v0
+    beq handle_paddle_ball_collide
+
+    ##########################################
+    # Check for ball/right paddle collision  #
+    ##########################################
+    addi $t0,$0,paddle_width
+    push $t0
+
+    addi $t0,$0,ball_width
+    push $t0
+
+    addi $t0,$0,paddle_height
+    push $t0
+
+    addi $t0,$0,ball_height
+    push $t0
+
+    lw $t0,$0,right_paddle_oam
+    add $t0,$t0,oam_copy
+    lw $t0,$0,$t0
+    push $t0
+
+    lw $t0,$0,ball_oam
+    add $t0,$t0,oam_copy
+    lw $t0,$0,$t0
+    push $t0
+
+    call check_collision
+    li $t0,$0,TRUE
+    sub $0,$t0,$v0
+    beq handle_paddle_ball_collide
+
+    b end_handle_paddle_ball_collide
+    handle_paddle_ball_collide: nop
+        lw $t0,$0,ball_oam
+        addi $t0,$t0,oam_copy
+        lw $a0,$0,$t0
+        call get_x
+
+        add $a0,$0,$v0
+        call negate
+
+        add $a0,$0,$t0
+        add $a1,$0,$v0
+        call set_x
+
+        lw $t1,$0,ball_oam
+        sld $t1,$v0
+
+        addi $t1,$t1,oam_copy
+        sw $v0,$t1,0
+        end_handle_paddle_ball_collide: nop
+
+    ##########################################
+    # Check for ball out of bounds           #
+    ##########################################
+
+    ############################
+    # Move left paddle         #
+    ############################
+    lw $s0,$0,left_paddle_yvel
+    push $s0
+
+    lw $s0,$0,left_paddle_xvel
+    push $s0
+
+    lw $s0,$0,left_paddle_oam
+    push $s0
+
+    call move_sprite_img
+
+    ############################
+    # Move right paddle        #
+    ############################
+    lw $s0,$0,right_paddle_yvel
+    push $s0
+
+    lw $s0,$0,right_paddle_xvel
+    push $s0
+
+    lw $s0,$0,right_paddle_oam
+    push $s0
+
+    call move_sprite_img
+
+    ############################
+    # Move ball                #
+    ############################
+    lw $s0,$0,ball_yvel
+    push $s0
+
+    lw $s0,$s0,ball_xvel
+    push $s0
+
+    lw $s0,$s0,ball_oam
+    push $s0
+
+    call move_sprite_img
+
+    end_game_tick_interrupt: nop
+        pop $s0
+        jr $epc
 
 # handle keyboard interrupt 
 #
