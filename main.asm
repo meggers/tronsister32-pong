@@ -115,17 +115,19 @@ game_tick_interrupt: nop
     push $t0
 
     lw $t0,$0,left_paddle_oam
-    add $t0,$t0,oam_copy
-    lw $t0,$0,$t0
+    li $t1,oam_copy
+    add $t0,$t0,$t1
+    lw $t0,$t0,0
     push $t0
 
     lw $t0,$0,ball_oam
-    add $t0,$t0,oam_copy
-    lw $t0,$0,$t0
+    li $t1,oam_copy
+    add $t0,$t0,$t1
+    lw $t0,$t0,0
     push $t0
 
     call check_collision
-    li $t0,$0,TRUE
+    lw $t0,$0,TRUE
     sub $0,$t0,$v0
     beq handle_paddle_ball_collide
 
@@ -145,25 +147,28 @@ game_tick_interrupt: nop
     push $t0
 
     lw $t0,$0,right_paddle_oam
-    add $t0,$t0,oam_copy
-    lw $t0,$0,$t0
+    li $t1,oam_copy
+    add $t0,$t0,$t1
+    lw $t0,$t0,0
     push $t0
 
     lw $t0,$0,ball_oam
-    add $t0,$t0,oam_copy
-    lw $t0,$0,$t0
+    li $t1,oam_copy
+    add $t0,$t0,$t1
+    lw $t0,$t0,0
     push $t0
 
     call check_collision
-    li $t0,$0,TRUE
+    lw $t0,$0,TRUE
     sub $0,$t0,$v0
     beq handle_paddle_ball_collide
 
     b end_handle_paddle_ball_collide
     handle_paddle_ball_collide: nop
         lw $t0,$0,ball_oam
-        addi $t0,$t0,oam_copy
-        lw $a0,$0,$t0
+        li $t1,oam_copy
+        add $t0,$t0,$t1
+        lw $a0,$t0,0
         call get_x
 
         add $a0,$0,$v0
@@ -176,7 +181,8 @@ game_tick_interrupt: nop
         lw $t1,$0,ball_oam
         sld $t1,$v0
 
-        addi $t1,$t1,oam_copy
+        li $t0,oam_copy
+        add $t1,$t1,$t0
         sw $v0,$t1,0
         end_handle_paddle_ball_collide: nop
 
@@ -193,6 +199,9 @@ game_tick_interrupt: nop
     lw $s0,$0,left_paddle_xvel
     push $s0
 
+    li $s0,$0,paddle_size
+    push $s0
+
     lw $s0,$0,left_paddle_oam
     push $s0
 
@@ -207,6 +216,9 @@ game_tick_interrupt: nop
     lw $s0,$0,right_paddle_xvel
     push $s0
 
+    li $s0,$0,paddle_size
+    push $s0
+
     lw $s0,$0,right_paddle_oam
     push $s0
 
@@ -219,6 +231,9 @@ game_tick_interrupt: nop
     push $s0
 
     lw $s0,$s0,ball_xvel
+    push $s0
+
+    li $s0,$0,ball_size
     push $s0
 
     lw $s0,$s0,ball_oam
@@ -274,7 +289,7 @@ keyboard_interrupt: nop
     end_if_i: nop
 
     if_k: nop
-        addi $t0,$0,0x73
+        addi $t0,$0,0x6B
         sub $0,$idr,$t0
         bne end_if_k
 
