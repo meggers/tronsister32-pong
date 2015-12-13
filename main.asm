@@ -49,7 +49,9 @@ initialize: nop
     sw $0,$0,left_paddle_yvel
     sw $0,$0,right_paddle_xvel
     sw $0,$0,right_paddle_yvel
-    sw $0,$0,ball_xvel
+
+    li $t0,1
+    sw $t0,$0,ball_xvel
     sw $0,$0,ball_yvel
 
     #############################
@@ -163,21 +165,17 @@ game_tick_interrupt: nop
     push $t0
 
     lw $t0,$0,left_paddle_oam
-    li $t1,oam_copy
-    add $t0,$t0,$t1
-    lw $t0,$t0,0
+    lw $t0,$t0,oam_copy
     push $t0
 
     lw $t0,$0,ball_oam
-    li $t1,oam_copy
-    add $t0,$t0,$t1
-    lw $t0,$t0,0
+    lw $t0,$t0,oam_copy
     push $t0
 
     call check_collision
     lw $t0,$0,TRUE
     sub $0,$t0,$v0
-    beq handle_paddle_ball_collide
+    beq handle_lpaddle_ball_collide
 
     ##########################################
     # Check for ball/right paddle collision  #
@@ -195,23 +193,39 @@ game_tick_interrupt: nop
     push $t0
 
     lw $t0,$0,right_paddle_oam
-    li $t1,oam_copy
-    add $t0,$t0,$t1
-    lw $t0,$t0,0
+    lw $t0,$t0,oam_copy
     push $t0
 
     lw $t0,$0,ball_oam
-    li $t1,oam_copy
-    add $t0,$t0,$t1
-    lw $t0,$t0,0
+    lw $t0,$t0,oam_copy
     push $t0
 
     call check_collision
     lw $t0,$0,TRUE
     sub $0,$t0,$v0
-    beq handle_paddle_ball_collide
+    beq handle_rpaddle_ball_collide
 
     b end_handle_paddle_ball_collide
+
+    ##########################################
+    # Handle ball/paddle collision           #
+    ##########################################
+    handle_lpaddle_ball_collide: nop
+        lw $t0,$0,left_paddle_yvel
+        lw $t1,$0,ball_yvel
+        add $t2,$t0,$t1
+        sw $t2,$0,ball_yvel
+
+        b handle_paddle_ball_collide
+
+    handle_rpaddle_ball_collide: nop
+        lw $t0,$0,right_paddle_yvel
+        lw $t1,$0,ball_yvel
+        add $t2,$t0,$t1
+        sw $t2,$0,ball_yvel
+
+        b handle_paddle_ball_collide
+
     handle_paddle_ball_collide: nop
         lw $a0,$0,ball_xvel
         call negate
@@ -261,7 +275,8 @@ game_tick_interrupt: nop
         sw $t0,$0,left_score
 
     # left/right oob set reset flag
-    or $at,$at,1
+    li $t0,1
+    or $at,$at,$t0
     b end_game_tick_interrupt
 
     # if top or bottom reverse y vel
