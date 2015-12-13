@@ -15,13 +15,16 @@
 ##########################################################################################################################
 #                                                                                                                        #
 #   Special Notes:                                                                                                       #
-#       $ra is used as a flag register                                                                                   #
+#       $at is used as a flag register                                                                                   #
 #       -------------------------------                                                                                  #
-#           $ra[0] - game reset flag                                                                                     #
+#           $at[0] - game reset flag                                                                                     #
 #                                                                                                                        #
 ##########################################################################################################################
 
 .data
+
+left_score:         .word 0
+right_score:        .word 0
 
 left_paddle_oam:    .word 0
 left_paddle_xvel:   .word 0
@@ -38,6 +41,16 @@ ball_yvel:          .word 0
 .text
 
 initialize: nop
+
+    #############################
+    # reset velocities          #
+    #############################
+    sw $0,$0,left_paddle_xvel
+    sw $0,$0,left_paddle_yvel
+    sw $0,$0,right_paddle_xvel
+    sw $0,$0,right_paddle_yvel
+    sw $0,$0,ball_xvel
+    sw $0,$0,ball_yvel
 
     #############################
     # load left paddle          #
@@ -74,7 +87,7 @@ initialize: nop
     li $s1,8                    # y (8 from top)
     push $s1                    #
                                 #
-    li $s2,8                    # x (8 from left)
+    li $s2,10                   # x (8 from left)
     push $s2                    #
                                 #
     li $s3,ball_width           # ball width
@@ -122,9 +135,10 @@ main_loop: nop
         andi $s0,$at,1
         addi $s0,$s0,-1
         bne check_flag1
-
+    
         b initialize
 
+    # unassigned flag
     check_flag1: nop
 
     b main_loop
@@ -207,12 +221,60 @@ game_tick_interrupt: nop
     ##########################################
     # Check for ball out of bounds           #
     ##########################################
+    lw $t0,$0,ball_oam
+    lw $t0,$t0,oam_copy
 
-        # check top or bottom, if hit reverse y vel
-        # check left out of bounds, if out, increment right points
-        # check right out of bounds, if out, increment left points
-        # if out of bounds, go back to initialize
-            # probably gonna need to set a flag for this
+    add $a0,$0,$t0
+    call get_x
+    push $v0
+
+    add $a0,$0,$t0
+    call get_y
+    push $v0
+
+    li $t0,ball_width
+    push $t0
+
+    li $t0,ball_height
+    push $t0
+
+    call check_oob
+
+    # check ball left oob
+    check_ball_oob_l: nop
+        andi $t0,$v0,8
+        sub $0,$0,$t0
+        beq check_ball_oob_r
+
+        lw $t0,$0,right_score
+        addi $t0,$t0,1
+        sw $t0,$0,right_score
+
+    # check ball right oob
+    check_ball_oob_r: nop
+        andi $t0,$v0,2
+        sub $0,$0,$t0
+        beq check_ball_oob_tb
+
+        lw $t0,$0,left_score
+        addi $t0,$t0,1
+        sw $t0,$0,left_score
+
+    # left/right oob set reset flag
+    or $at,$at,1
+    b end_game_tick_interrupt
+
+    # if top or bottom reverse y vel
+    check_ball_oob_tb: nop
+        andi $t0,$v0,5
+        sub $0,$0,$t0
+        beq end_check_ball_oob
+
+        lw $a0,$0,ball_yvel
+        call negate
+        sw $v0,$0,ball_yvel
+
+    end_check_ball_oob: nop
 
     ############################
     # Move left paddle         #
@@ -265,7 +327,7 @@ game_tick_interrupt: nop
         or $t1,$s0,$s1
         sub $0,$0,$t1
         beq end_game_tick_interrupt
-        
+
         push $s0
         push $s1
 
