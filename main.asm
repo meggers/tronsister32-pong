@@ -217,53 +217,65 @@ game_tick_interrupt: nop
     ############################
     # Move left paddle         #
     ############################
-    lw $s0,$0,left_paddle_yvel
-    push $s0
+    move_left_paddle: nop
+        lw $s0,$0,left_paddle_yvel
+        lw $s1,$0,left_paddle_xvel
+        or $t1,$s0,$s1
+        sub $0,$0,$t1
+        beq move_right_paddle
 
-    lw $s0,$0,left_paddle_xvel
-    push $s0
+        push $s0
+        push $s1
 
-    li $s0,paddle_size
-    push $s0
+        li $s0,paddle_size
+        push $s0
 
-    lw $s0,$0,left_paddle_oam
-    push $s0
+        lw $s0,$0,left_paddle_oam
+        push $s0
 
-    call move_sprite_img
+        call move_sprite_img
 
     ############################
     # Move right paddle        #
     ############################
-    lw $s0,$0,right_paddle_yvel
-    push $s0
+    move_right_paddle: nop
+        lw $s0,$0,right_paddle_yvel
+        lw $s1,$0,right_paddle_xvel
+        or $t1,$s0,$s1
+        sub $0,$0,$t1
+        beq move_ball
 
-    lw $s0,$0,right_paddle_xvel
-    push $s0
+        push $s0
+        push $s1
 
-    li $s0,paddle_size
-    push $s0
+        li $s0,paddle_size
+        push $s0
 
-    lw $s0,$0,right_paddle_oam
-    push $s0
+        lw $s0,$0,right_paddle_oam
+        push $s0
 
-    call move_sprite_img
+        call move_sprite_img
 
     ############################
     # Move ball                #
     ############################
-    lw $s0,$0,ball_yvel
-    push $s0
+    move_ball: nop
+        lw $s0,$0,ball_yvel
+        lw $s1,$0,ball_xvel
+        or $t1,$s0,$s1
+        sub $0,$0,$t1
+        beq end_game_tick_interrupt
+        
+        push $s0
+        push $s1
 
-    lw $s0,$0,ball_xvel
-    push $s0
+        li $s0,ball_size
+        push $s0
 
-    li $s0,ball_size
-    push $s0
+        lw $s0,$0,ball_oam
+        push $s0
 
-    lw $s0,$0,ball_oam
-    push $s0
-
-    call move_sprite_img
+        call move_sprite_img
 
     end_game_tick_interrupt: nop
         pop $s0
