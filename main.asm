@@ -1,3 +1,26 @@
+ ########################################################################################################################
+#  _____                   _     _           _____  _____       ______                                                   #
+# |_   _|                 (_)   | |         |____ |/ __  \      | ___ \                                                  #
+#   | |_ __ ___  _ __  ___ _ ___| |_ ___ _ __   / /`' / /'______| |_/ /__  _ __   __ _                                   #
+#   | | '__/ _ \| '_ \/ __| / __| __/ _ \ '__|  \ \  / / |______|  __/ _ \| '_ \ / _` |                                  #
+#   | | | | (_) | | | \__ \ \__ \ ||  __/ | .___/ /./ /___      | | | (_) | | | | (_| |                                  #
+#   \_/_|  \___/|_| |_|___/_|___/\__\___|_| \____/ \_____/      \_|  \___/|_| |_|\__, |                                  #
+#                                                                                 __/ |                                  #
+#                                                                                |___/                                   #
+#                                                                                                                        #
+##########################################################################################################################
+#                                                                                                                        #
+#   A simple classic for the Tronsistor-32 ISA.                                                                          #
+#                                                                                                                        #
+##########################################################################################################################
+#                                                                                                                        #
+#   Special Notes:                                                                                                       #
+#       $ra is used as a flag register                                                                                   #
+#       -------------------------------                                                                                  #
+#           $ra[0] - game reset flag                                                                                     #
+#                                                                                                                        #
+##########################################################################################################################
+
 .data
 
 left_paddle_oam:    .word 0
@@ -93,6 +116,17 @@ initialize: nop
     #############################
 
 main_loop: nop
+
+    # game reset flag
+    check_flag0: nop
+        andi $s0,$at,1
+        addi $s0,$s0,-1
+        bne check_flag1
+
+        b initialize
+
+    check_flag1: nop
+
     b main_loop
 
 # handle game tick interrupt
@@ -165,30 +199,20 @@ game_tick_interrupt: nop
 
     b end_handle_paddle_ball_collide
     handle_paddle_ball_collide: nop
-        lw $t0,$0,ball_oam
-        li $t1,oam_copy
-        add $t0,$t0,$t1
-        lw $a0,$t0,0
-        call get_x
-
-        add $a0,$0,$v0
+        lw $a0,$0,ball_xvel
         call negate
-
-        add $a0,$0,$t0
-        add $a1,$0,$v0
-        call set_x
-
-        lw $t1,$0,ball_oam
-        sld $t1,$v0
-
-        li $t0,oam_copy
-        add $t1,$t1,$t0
-        sw $v0,$t1,0
+        sw $v0,$0,ball_xvel
         end_handle_paddle_ball_collide: nop
 
     ##########################################
     # Check for ball out of bounds           #
     ##########################################
+
+        # check top or bottom, if hit reverse y vel
+        # check left out of bounds, if out, increment right points
+        # check right out of bounds, if out, increment left points
+        # if out of bounds, go back to initialize
+            # probably gonna need to set a flag for this
 
     ############################
     # Move left paddle         #
@@ -199,7 +223,7 @@ game_tick_interrupt: nop
     lw $s0,$0,left_paddle_xvel
     push $s0
 
-    li $s0,$0,paddle_size
+    li $s0,paddle_size
     push $s0
 
     lw $s0,$0,left_paddle_oam
@@ -216,7 +240,7 @@ game_tick_interrupt: nop
     lw $s0,$0,right_paddle_xvel
     push $s0
 
-    li $s0,$0,paddle_size
+    li $s0,paddle_size
     push $s0
 
     lw $s0,$0,right_paddle_oam
@@ -230,13 +254,13 @@ game_tick_interrupt: nop
     lw $s0,$0,ball_yvel
     push $s0
 
-    lw $s0,$s0,ball_xvel
+    lw $s0,$0,ball_xvel
     push $s0
 
-    li $s0,$0,ball_size
+    li $s0,ball_size
     push $s0
 
-    lw $s0,$s0,ball_oam
+    lw $s0,$0,ball_oam
     push $s0
 
     call move_sprite_img
@@ -263,7 +287,7 @@ keyboard_interrupt: nop
         sub $0,$idr,$t0
         bne end_if_w
 
-        addi $t0,$0,1
+        addi $t0,$0,-1
         sw $t0,$0,left_paddle_yvel
         b ki_ret
     end_if_w: nop
@@ -273,7 +297,7 @@ keyboard_interrupt: nop
         sub $0,$idr,$t0
         bne end_if_s
 
-        addi $t0,$0,-1
+        addi $t0,$0,1
         sw $t0,$0,left_paddle_yvel
         b ki_ret
     end_if_s: nop
@@ -283,7 +307,7 @@ keyboard_interrupt: nop
         sub $0,$idr,$t0
         bne end_if_i
 
-        addi $t0,$0,1
+        addi $t0,$0,-1
         sw $t0,$0,right_paddle_yvel
         b ki_ret
     end_if_i: nop
@@ -293,7 +317,7 @@ keyboard_interrupt: nop
         sub $0,$idr,$t0
         bne end_if_k
 
-        addi $t0,$0,-1
+        addi $t0,$0,1
         sw $t0,$0,right_paddle_yvel
         b ki_ret
     end_if_k: nop
