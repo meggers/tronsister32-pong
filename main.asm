@@ -210,8 +210,6 @@ initialize: nop
 
 main_loop: nop
 
-    b 0
-
     # game reset flag
     check_flag0: nop
         andi $s0,$at,1
