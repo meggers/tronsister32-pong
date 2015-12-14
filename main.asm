@@ -357,7 +357,7 @@ game_tick_interrupt: nop
         b handle_oob_lr
 
     # left/right oob set reset flag
-    handle_oob_lr:
+    handle_oob_lr: nop
         li $t0,1
         or $at,$at,$t0
         b end_game_tick_interrupt
