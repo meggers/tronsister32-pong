@@ -130,6 +130,20 @@ initialize: nop
     add $s0,$0,$v0              # get next free position in oam
     #############################
 
+    #############################
+    # draw left score           #
+    #############################
+    lw $a0,$0,left_score
+    li $a1,16
+    call display_2digit_decimal
+
+    #############################
+    # draw right score          #
+    #############################
+    lw $a0,$0,right_score
+    li $a1,24
+    call display_2digit_decimal
+
 main_loop: nop
 
     # game reset flag
