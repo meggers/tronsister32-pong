@@ -114,7 +114,7 @@ initialize: nop
     sw $0,$0,right_paddle_xvel
     sw $0,$0,right_paddle_yvel
 
-    li $t0,1
+    li $t0,-1
     sw $t0,$0,ball_xvel
     sw $0,$0,ball_yvel
 
@@ -150,10 +150,10 @@ initialize: nop
     push $s0                    # starting oam
     sw $s0,$0,ball_oam          #
                                 #
-    li $s1,124                  # y
+    li $s1,150                  # y
     push $s1                    #
                                 #
-    li $s2,124                  # x
+    li $s2,10                   # x
     push $s2                    #
                                 #
     li $s3,ball_width           # ball width
@@ -343,6 +343,7 @@ game_tick_interrupt: nop
         lw $t0,$0,right_score
         addi $t0,$t0,1
         sw $t0,$0,right_score
+        b handle_oob_lr
 
     # check ball right oob
     check_ball_oob_r: nop
@@ -353,11 +354,13 @@ game_tick_interrupt: nop
         lw $t0,$0,left_score
         addi $t0,$t0,1
         sw $t0,$0,left_score
+        b handle_oob_lr
 
     # left/right oob set reset flag
-    li $t0,1
-    or $at,$at,$t0
-    b end_game_tick_interrupt
+    handle_oob_lr:
+        li $t0,1
+        or $at,$at,$t0
+        b end_game_tick_interrupt
 
     # if top or bottom reverse y vel
     check_ball_oob_tb: nop
