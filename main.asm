@@ -61,10 +61,10 @@ initialize: nop
     push $s0                    #
     sw $s0,$0,left_paddle_oam   #
                                 #
-    li $s1,0                    # y (top)
+    li $s1,116                  # y
     push $s1                    #
                                 #
-    li $s2,0                    # x (left)
+    li $s2,0                    # x
     push $s2                    #
                                 #
     li $s3,paddle_width         # paddle width
@@ -86,10 +86,10 @@ initialize: nop
     push $s0                    # starting oam
     sw $s0,$0,ball_oam          #
                                 #
-    li $s1,8                    # y (8 from top)
+    li $s1,124                  # y
     push $s1                    #
                                 #
-    li $s2,10                   # x (8 from left)
+    li $s2,124                  # x
     push $s2                    #
                                 #
     li $s3,ball_width           # ball width
@@ -111,10 +111,10 @@ initialize: nop
     push $s0                    # starting oam
     sw $s0,$0,right_paddle_oam  #
                                 #
-    li $s1,0                    # y (top)
+    li $s1,116                  # y
     push $s1                    #
                                 #
-    li $s2,248                  # x (right)
+    li $s2,248                  # x
     push $s2                    # 
                                 #
     li $s3,paddle_width         # paddle width
