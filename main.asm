@@ -23,8 +23,8 @@
 
 .data
 
-left_score:         .word 0
-right_score:        .word 0
+left_score:         .word 1
+right_score:        .word 52
 
 left_paddle_oam:    .word 0
 left_paddle_xvel:   .word 0
@@ -39,6 +39,70 @@ ball_xvel:          .word 1
 ball_yvel:          .word 0
 
 .text
+
+li $t0,36
+li $t1,char_P_index
+sbt $t0,$t1
+
+li $t0,37
+li $t1,char_L_index
+sbt $t0,$t1
+
+li $t0,38
+li $t1,char_A_index
+sbt $t0,$t1
+
+li $t0,39
+li $t1,char_Y_index
+sbt $t0,$t1
+
+li $t0,40
+li $t1,char_E_index
+sbt $t0,$t1
+
+li $t0,41
+li $t1,char_R_index
+sbt $t0,$t1
+
+li $t0,42
+li $t1,0
+sbt $t0,$t1
+
+li $t0,43
+li $t1,char_1_index
+sbt $t0,$t1
+
+li $t0,52
+li $t1,char_P_index
+sbt $t0,$t1
+
+li $t0,53
+li $t1,char_L_index
+sbt $t0,$t1
+
+li $t0,54
+li $t1,char_A_index
+sbt $t0,$t1
+
+li $t0,55
+li $t1,char_Y_index
+sbt $t0,$t1
+
+li $t0,56
+li $t1,char_E_index
+sbt $t0,$t1
+
+li $t0,57
+li $t1,char_R_index
+sbt $t0,$t1
+
+li $t0,58
+li $t1,0
+sbt $t0,$t1
+
+li $t0,59
+li $t1,char_2_index
+sbt $t0,$t1
 
 initialize: nop
 
@@ -134,17 +198,19 @@ initialize: nop
     # draw left score           #
     #############################
     lw $a0,$0,left_score
-    li $a1,16
+    li $a1,71
     call display_2digit_decimal
 
     #############################
     # draw right score          #
     #############################
     lw $a0,$0,right_score
-    li $a1,24
+    li $a1,87
     call display_2digit_decimal
 
 main_loop: nop
+
+    b 0
 
     # game reset flag
     check_flag0: nop
