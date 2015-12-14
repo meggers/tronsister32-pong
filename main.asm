@@ -23,8 +23,8 @@
 
 .data
 
-left_score:         .word 1
-right_score:        .word 52
+left_score:         .word 0
+right_score:        .word 0
 
 left_paddle_oam:    .word 0
 left_paddle_xvel:   .word 0
@@ -114,7 +114,7 @@ initialize: nop
     sw $0,$0,right_paddle_xvel
     sw $0,$0,right_paddle_yvel
 
-    li $t0,-1
+    li $t0,1
     sw $t0,$0,ball_xvel
     sw $0,$0,ball_yvel
 
@@ -125,7 +125,7 @@ initialize: nop
     push $s0                    #
     sw $s0,$0,left_paddle_oam   #
                                 #
-    li $s1,116                  # y
+    li $s1,112                  # y
     push $s1                    #
                                 #
     li $s2,0                    # x
@@ -150,10 +150,10 @@ initialize: nop
     push $s0                    # starting oam
     sw $s0,$0,ball_oam          #
                                 #
-    li $s1,150                  # y
+    li $s1,124                  # y
     push $s1                    #
                                 #
-    li $s2,10                   # x
+    li $s2,124                  # x
     push $s2                    #
                                 #
     li $s3,ball_width           # ball width
@@ -175,7 +175,7 @@ initialize: nop
     push $s0                    # starting oam
     sw $s0,$0,right_paddle_oam  #
                                 #
-    li $s1,116                  # y
+    li $s1,112                  # y
     push $s1                    #
                                 #
     li $s2,248                  # x
@@ -218,6 +218,7 @@ main_loop: nop
         addi $s0,$s0,-1
         bne check_flag1
     
+        andi $at,$at,0xFE
         b initialize
 
     # unassigned flag
